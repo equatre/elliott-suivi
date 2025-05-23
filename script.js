@@ -65,3 +65,11 @@ function updatePosition() {
 
 updatePosition();
 setInterval(updatePosition, 10000);
+
+document.getElementById('recenter').addEventListener('click', () => {
+    if (lastGoodPosition) {
+        map.setView(lastGoodPosition, 14);
+    } else {
+        alert("Position actuelle non disponible.");
+    }
+});
