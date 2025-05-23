@@ -67,8 +67,9 @@ updatePosition();
 setInterval(updatePosition, 10000);
 
 document.getElementById('recenter').addEventListener('click', () => {
-    if (lastGoodPosition) {
+    if (lastGoodPosition && map) {
         map.setView(lastGoodPosition, 14);
+        console.log("Carte recentrée sur :", lastGoodPosition);
     } else {
         alert("Position actuelle non disponible.");
     }
