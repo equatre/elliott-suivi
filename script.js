@@ -3,7 +3,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Charger la trace GPX
+// Charger la trace GPX avec icônes par défaut
 new L.GPX("cah2gene2305.gpx", {
     async: true,
     marker_options: {
@@ -15,7 +15,14 @@ new L.GPX("cah2gene2305.gpx", {
     map.fitBounds(e.target.getBounds());
 }).addTo(map);
 
-// Marqueur de position
+// Icône personnalisée pour ta position
+const positionIcon = L.icon({
+    iconUrl: 'https://dgalywyr863hv.cloudfront.net/pictures/athletes/143663846/32510117/1/medium.jpg',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+});
+
 let marker = null;
 let lastGoodPosition = null;
 
@@ -29,7 +36,6 @@ function updatePosition() {
             const lat = parseFloat(data.lat);
             const lon = parseFloat(data.lon);
 
-            // Vérifier si la position est valide
             if (lat === 0 && lon === 0) {
                 console.warn("Position invalide (0,0), conservation dernière position");
                 document.getElementById('status').innerText =
@@ -37,7 +43,6 @@ function updatePosition() {
                 return;
             }
 
-            // Mise à jour de la dernière position connue
             lastGoodPosition = [lat, lon];
             console.log("Nouvelle position :", lat, lon);
 
@@ -45,7 +50,7 @@ function updatePosition() {
                 `🛰️ Position reçue à ${new Date().toLocaleTimeString()}`;
 
             if (!marker) {
-                marker = L.marker(lastGoodPosition, { title: "Moi 🚴" }).addTo(map);
+                marker = L.marker(lastGoodPosition, { icon: positionIcon, title: "Moi 🚴" }).addTo(map);
                 map.setView(lastGoodPosition, 14);
             } else {
                 marker.setLatLng(lastGoodPosition);
@@ -58,5 +63,5 @@ function updatePosition() {
         });
 }
 
-updatePosition(); // appel immédiat
-setInterval(updatePosition, 10000); // toutes les 10 secondes
+updatePosition();
+setInterval(updatePosition, 10000);
