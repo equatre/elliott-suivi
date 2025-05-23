@@ -3,7 +3,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Load GPX track
+// Charger la trace GPX
 new L.GPX("cah2gene2305.gpx", {
     async: true,
     marker_options: {
@@ -15,15 +15,27 @@ new L.GPX("cah2gene2305.gpx", {
     map.fitBounds(e.target.getBounds());
 }).addTo(map);
 
-// Live tracking
-let marker = L.marker([0, 0]).addTo(map);
+// Marqueur de position
+let marker = null;
+
 function updatePosition() {
     fetch('https://elliott-suivi-backend.onrender.com/position')
         .then(response => response.json())
         .then(data => {
             const lat = parseFloat(data.lat);
             const lon = parseFloat(data.lon);
-            marker.setLatLng([lat, lon]);
-        });
+
+            console.log("Position reçue :", lat, lon);
+
+            if (!marker) {
+                marker = L.marker([lat, lon], { title: "Moi 🚴" }).addTo(map);
+                map.setView([lat, lon], 14);
+            } else {
+                marker.setLatLng([lat, lon]);
+            }
+        })
+        .catch(err => console.error("Erreur récupération position :", err));
 }
-setInterval(updatePosition, 10000);
+
+updatePosition(); // appel immédiat
+setInterval(updatePosition, 10000); // mise à jour toutes les 10 secondes
