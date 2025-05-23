@@ -31,13 +31,18 @@ function updatePosition() {
 
             // Vérifier si la position est valide
             if (lat === 0 && lon === 0) {
-                console.warn("Position invalide reçue (0,0), conservation de la dernière position.");
+                console.warn("Position invalide (0,0), conservation dernière position");
+                document.getElementById('status').innerText =
+                    `⚠️ Dernière position conservée – ${new Date().toLocaleTimeString()}`;
                 return;
             }
 
             // Mise à jour de la dernière position connue
             lastGoodPosition = [lat, lon];
             console.log("Nouvelle position :", lat, lon);
+
+            document.getElementById('status').innerText =
+                `🛰️ Position reçue à ${new Date().toLocaleTimeString()}`;
 
             if (!marker) {
                 marker = L.marker(lastGoodPosition, { title: "Moi 🚴" }).addTo(map);
@@ -48,10 +53,8 @@ function updatePosition() {
         })
         .catch(err => {
             console.warn("Erreur lors de la récupération de la position :", err.message);
-            if (lastGoodPosition && marker) {
-                // Ne rien faire = on garde le marqueur en place
-                console.log("On conserve la dernière position :", lastGoodPosition);
-            }
+            document.getElementById('status').innerText =
+                `⚠️ Dernière position conservée – ${new Date().toLocaleTimeString()}`;
         });
 }
 
