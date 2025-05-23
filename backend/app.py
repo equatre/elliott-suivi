@@ -6,10 +6,15 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/update', methods=['GET'])
+@app.route('/update', methods=['GET', 'POST'])
 def update_position():
-    lat = request.args.get('lat')
-    lon = request.args.get('lon')
+    if request.method == 'POST':
+        lat = request.form.get('lat') or request.args.get('lat')
+        lon = request.form.get('lon') or request.args.get('lon')
+    else:
+        lat = request.args.get('lat')
+        lon = request.args.get('lon')
+
     if lat and lon:
         with open('backend/position.json', 'w') as f:
             json.dump({"lat": lat, "lon": lon}, f)
