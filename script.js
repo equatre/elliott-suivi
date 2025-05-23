@@ -17,25 +17,43 @@ new L.GPX("cah2gene2305.gpx", {
 
 // Marqueur de position
 let marker = null;
+let lastGoodPosition = null;
 
 function updatePosition() {
     fetch('https://elliott-suivi-backend.onrender.com/position')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error("Erreur HTTP " + response.status);
+            return response.json();
+        })
         .then(data => {
             const lat = parseFloat(data.lat);
             const lon = parseFloat(data.lon);
 
-            console.log("Position reçue :", lat, lon);
+            // Vérifier si la position est valide
+            if (lat === 0 && lon === 0) {
+                console.warn("Position invalide reçue (0,0), conservation de la dernière position.");
+                return;
+            }
+
+            // Mise à jour de la dernière position connue
+            lastGoodPosition = [lat, lon];
+            console.log("Nouvelle position :", lat, lon);
 
             if (!marker) {
-                marker = L.marker([lat, lon], { title: "Moi 🚴" }).addTo(map);
-                map.setView([lat, lon], 14);
+                marker = L.marker(lastGoodPosition, { title: "Moi 🚴" }).addTo(map);
+                map.setView(lastGoodPosition, 14);
             } else {
-                marker.setLatLng([lat, lon]);
+                marker.setLatLng(lastGoodPosition);
             }
         })
-        .catch(err => console.error("Erreur récupération position :", err));
+        .catch(err => {
+            console.warn("Erreur lors de la récupération de la position :", err.message);
+            if (lastGoodPosition && marker) {
+                // Ne rien faire = on garde le marqueur en place
+                console.log("On conserve la dernière position :", lastGoodPosition);
+            }
+        });
 }
 
 updatePosition(); // appel immédiat
-setInterval(updatePosition, 10000); // mise à jour toutes les 10 secondes
+setInterval(updatePosition, 10000); // toutes les 10 secondes
