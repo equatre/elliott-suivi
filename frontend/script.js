@@ -18,7 +18,7 @@ new L.GPX("cah2gene2305.gpx", {
 // Live tracking
 let marker = L.marker([0, 0]).addTo(map);
 function updatePosition() {
-    fetch('../backend/position.json')
+    fetch('https://elliott-suivi-backend.onrender.com/position')
         .then(response => response.json())
         .then(data => {
             const lat = parseFloat(data.lat);
